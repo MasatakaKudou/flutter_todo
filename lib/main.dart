@@ -27,11 +27,10 @@ class TodoListState extends State<TodoList> {
 
   List<String> todoItems = [];
 
-  void newTodo() {
-    setState(() {
-      int index = todoItems.length;
-      todoItems.add('Todo: ' + index.toString());
-    });
+  void newTodo(String task) {
+    if (task.length > 0) {
+      setState(() => todoItems.add(task));
+    }
   }
 
   Widget _buildTodoList() {
@@ -39,7 +38,7 @@ class TodoListState extends State<TodoList> {
       itemBuilder: (context, index) {
         if (index < todoItems.length) {
           return _buildTodoItem(todoItems[index]);
-        }else{
+        } else {
           return _buildTodoItem("");
         }
       },
@@ -60,10 +59,36 @@ class TodoListState extends State<TodoList> {
       ),
       body: _buildTodoList(),
       floatingActionButton: new FloatingActionButton(
-          onPressed: newTodo,
+          onPressed: _pushAddToScreen,
           tooltip: 'Add task',
           child: new Icon(Icons.add)
       ),
     );
   }
+
+  void _pushAddToScreen() {
+    Navigator.of(context).push(
+        new MaterialPageRoute(
+            builder: (context) {
+              return new Scaffold(
+                  appBar: new AppBar(
+                      title: new Text('Add a new task')
+                  ),
+                  body: new TextField(
+                    autofocus: true,
+                    onSubmitted: (val) {
+                      newTodo(val);
+                      Navigator.pop(context);
+                    },
+                    decoration: new InputDecoration(
+                        hintText: 'input new todo',
+                        contentPadding: const EdgeInsets.all(16.0)
+                    ),
+                  )
+              );
+            }
+        )
+    );
+  }
+
 }
