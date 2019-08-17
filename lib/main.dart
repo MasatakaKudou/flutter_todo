@@ -25,145 +25,45 @@ class TodoList extends StatefulWidget {
 
 class TodoListState extends State<TodoList> {
 
-  var yearList =[];
-  var monthList = [];
-  var dayList = [];
-  List todoList = [];
-  var num = 0;
+  List<String> todoItems = [];
 
-
-  final formKey = GlobalKey<FormState>();
-  final yearFocus = FocusNode();
-  final monthFocus = FocusNode();
-  final dayFocus = FocusNode();
-  final todoFocus = FocusNode();
-
-  void newYear(var _year){
+  void newTodo() {
     setState(() {
-      yearList += _year;
+      int index = todoItems.length;
+      todoItems.add('Todo: ' + index.toString());
     });
   }
 
-  void newMonth(var _month){
-    setState(() {
-      monthList += _month;
-    });
+  Widget _buildTodoList() {
+    return new ListView.builder(
+      itemBuilder: (context, index) {
+        if (index < todoItems.length) {
+          return _buildTodoItem(todoItems[index]);
+        }else{
+          return _buildTodoItem("");
+        }
+      },
+    );
   }
 
-  void newDay(var _day){
-    setState(() {
-      dayList += _day;
-    });
-  }
-
-  void newTodo(var _todo){
-    setState(() {
-      todoList += _todo;
-    });
+  Widget _buildTodoItem(String todoText) {
+    return new ListTile(
+        title: new Text(todoText)
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
+    return new Scaffold(
+      appBar: new AppBar(
+          title: new Text('Todo List')
       ),
-      body: Center(
-        child: Column(
-          children: <Widget>[
-            Form(
-              key: formKey,
-              child: Column(
-                children: <Widget>[
-                  yearFormField(context),
-                  monthFormField(context),
-                  dayFormField(context),
-                  todoFormField(context),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 15.0),
-                    child: RaisedButton(
-                        onPressed: (){
-                          if(formKey.currentState.validate()){
-                            formKey.currentState.save();
-                          }
-                        },
-                        child: Text('Add task'),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Text(
-              '<TodoList>'
-            ),
-          ],
-        ),
+      body: _buildTodoList(),
+      floatingActionButton: new FloatingActionButton(
+          onPressed: newTodo,
+          tooltip: 'Add task',
+          child: new Icon(Icons.add)
       ),
     );
   }
-
-  TextFormField yearFormField(BuildContext context){
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      textInputAction: TextInputAction.next,
-      autofocus: true,
-      decoration: InputDecoration(labelText: "年を入力してください"),
-      focusNode: yearFocus,
-      onFieldSubmitted: (v) {
-        yearFocus.unfocus();
-      },
-      onSaved: (value){
-        newYear(int.parse(value));
-      },
-    );
-  }
-
-  TextFormField monthFormField(BuildContext context){
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      textInputAction: TextInputAction.next,
-      autofocus: true,
-      decoration: InputDecoration(labelText: "月を入力してください"),
-      focusNode: monthFocus,
-      onFieldSubmitted: (v) {
-        monthFocus.unfocus();
-      },
-      onSaved: (value){
-        newMonth(int.parse(value));
-      },
-    );
-  }
-
-  TextFormField dayFormField(BuildContext context){
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      textInputAction: TextInputAction.next,
-      autofocus: true,
-      decoration: InputDecoration(labelText: "日を入力してください"),
-      focusNode: dayFocus,
-      onFieldSubmitted: (v) {
-        dayFocus.unfocus();
-      },
-      onSaved: (value){
-        newDay(int.parse(value));
-      },
-    );
-  }
-
-  TextFormField todoFormField(BuildContext context){
-    return TextFormField(
-      keyboardType: TextInputType.number,
-      textInputAction: TextInputAction.done,
-      autofocus: true,
-      decoration: InputDecoration(labelText: "やることを入力してください"),
-      focusNode: todoFocus,
-      onFieldSubmitted: (v) {
-        todoFocus.unfocus();
-      },
-      onSaved: (value){
-        newDay(int.parse(value));
-      },
-    );
-  }
-
 }
