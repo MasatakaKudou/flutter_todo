@@ -99,9 +99,13 @@ class TodoListState extends State<TodoList> {
   }
 
   Widget _buildTodoItem(String todoText,int index) {
-    return new ListTile(
-        title: new Text(todoText),
-        onTap: () => _promptRemoveTodoItem(index)
+    return new Card(
+        child: ListTile(
+            title: new Text(todoText),
+            subtitle: Text('Here is a second line'),
+            trailing: Icon(Icons.more_vert),
+          onTap: () => _promptRemoveTodoItem(index)
+        ),
     );
   }
 
