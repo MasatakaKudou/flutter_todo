@@ -25,103 +25,112 @@ class TodoList extends StatefulWidget {
 
 class TodoListState extends State<TodoList> {
 
-  List<String> todoItems = [];
-
-  void newTodo(String task) {
-    if (task.length > 0) {
-      setState(() => todoItems.add(task));
-    }
-  }
-
-  void _pushAddToScreen() {
-    Navigator.of(context).push(
-        new MaterialPageRoute(
-            builder: (context) {
-              return new Scaffold(
-                  appBar: new AppBar(
-                      title: new Text('Add a new task')
-                  ),
-                  body: new TextField(
-                    autofocus: true,
-                    onSubmitted: (val) {
-                      newTodo(val);
-                      Navigator.pop(context);
-                    },
-                    decoration: new InputDecoration(
-                        hintText: 'input new todo',
-                        contentPadding: const EdgeInsets.all(16.0)
-                    ),
-                  )
-              );
-            }
-        )
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("TodoList Page"),
+      ),
+      body: Text("aaa"),
+      floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => TodoForm()),
+            );
+          },
+          child: new Icon(Icons.add)
+          ),
     );
   }
+}
 
-  void removeTodo(int index){
-    setState(() => todoItems.removeAt(index));
-  }
+class Task{
+  /*プロパティ*/
+  int _id; //タスクを識別
+  String _title; //タイトル
+  String _subtitle; //サブタイトル
 
-  void _promptRemoveTodoItem(int index) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return new AlertDialog(
-              title: new Text( todoItems[index] + ' is done?'),
-              actions: <Widget>[
-                new FlatButton(
-                    child: new Text('CANCEL'),
-                    onPressed: () => Navigator.of(context).pop()
-                ),
-                new FlatButton(
-                    child: new Text('DONE'),
-                    onPressed: () {
-                      removeTodo(index);
-                      Navigator.of(context).pop();
-                    }
-                )
-              ]
-          );
-        }
-    );
-  }
+  /*コンストラクター*/
+  Task(this._id,this._title,this._subtitle);
 
-  Widget _buildTodoList() {
-    return new ListView.builder(
-      itemBuilder: (context, index) {
-        if (index < todoItems.length) {
-          return _buildTodoItem(todoItems[index], index);
-        } else {
-          return _buildTodoItem("", 0);
-        }
-      },
-    );
-  }
+  /*ゲッター*/
+  int get id => _id;
+  String get title => _title;
+  String get subtitle => _subtitle;
 
-  Widget _buildTodoItem(String todoText,int index) {
-    return new Card(
-        child: ListTile(
-            title: new Text(todoText),
-            subtitle: Text('Here is a second line'),
-            trailing: Icon(Icons.more_vert),
-          onTap: () => _promptRemoveTodoItem(index)
-        ),
-    );
-  }
+}
+
+class TodoForm extends StatefulWidget {
+  TodoForm({Key key, this.title}) : super(key: key);
+  final String title;
+  @override
+  TodoFormState createState() => TodoFormState();
+}
+
+class TodoFormState extends State<TodoForm> {
+
+  int _id;
+  String _title;
+  String _subtitle;
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-          title: new Text('Todo List')
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Add Task Page"),
       ),
-      body: _buildTodoList(),
-      floatingActionButton: new FloatingActionButton(
-          onPressed: _pushAddToScreen,
-          tooltip: 'Add task',
-          child: new Icon(Icons.add)
+      body: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            TextFormField(
+              validator: (value) {
+                if (value.isEmpty) { //何も値を入力してない時
+                  return 'タイトルを入力してください。';
+                } else { //値を入力している時
+                  return null;
+                }
+              },
+              onSaved: (value) {
+                setState(() {
+                  _title = value; //タイトルを更新する
+                });
+              },
+              decoration: InputDecoration(
+                  hintText: "Input title",
+                  contentPadding: const EdgeInsets.all(16.0)
+              ),
+            ),
+            TextFormField(
+              validator: (value) {
+                if (value.isEmpty) {  //何も値を入力してない時
+                  return 'タイトルを入力してください。';
+                } else {  //値を入力している時
+                  return null;
+                }
+              },
+              onSaved: (value) {
+                setState(() {
+                  _subtitle = value; //サブタイトルを更新
+                });
+              },
+              decoration: InputDecoration(
+                hintText: "Input subtitle",
+                contentPadding: const EdgeInsets.all(16.0)
+              ),
+            ),
+            RaisedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Add Task"),
+            ),
+          ],
+        ),
       ),
     );
   }
-
 }
