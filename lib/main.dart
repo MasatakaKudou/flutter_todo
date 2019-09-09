@@ -25,13 +25,34 @@ class TodoList extends StatefulWidget {
 
 class TodoListState extends State<TodoList> {
 
+  final _todo = <Task>[];
+
+  Widget _buildTodoList() {
+    return ListView.builder(
+      itemBuilder: (context, i) {
+        return _buildTask(_todo[i]);
+      },
+      itemCount: _todo.length,
+    );
+  }
+
+  Widget _buildTask(Task task) {
+    return Card(
+        child: ListTile(
+          title: Text(task.title),
+          subtitle: Text(task.subtitle),
+          trailing: Icon(Icons.more_vert),
+        )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text("TodoList Page"),
       ),
-      body: Text("aaa"),
+      body: _buildTodoList(),
       floatingActionButton: FloatingActionButton(
           onPressed: () {
             Navigator.push(
@@ -40,7 +61,7 @@ class TodoListState extends State<TodoList> {
             );
           },
           child: new Icon(Icons.add)
-          ),
+      ),
     );
   }
 }
@@ -59,8 +80,12 @@ class Task{
   String get title => _title;
   String get subtitle => _subtitle;
 
+/*セッター*/
+//  set id(int id) => _id = id;
+
 }
 
+/*遷移先のフォーム*/
 class TodoForm extends StatefulWidget {
   TodoForm({Key key, this.title}) : super(key: key);
   final String title;
@@ -73,7 +98,15 @@ class TodoFormState extends State<TodoForm> {
   int _id;
   String _title;
   String _subtitle;
+  Task task;
   final _formKey = GlobalKey<FormState>();
+
+  void _buildTask() {
+    task = Task(_id, _title, _subtitle);
+    print(_id);
+    print(_title);
+    print(_subtitle);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,13 +151,17 @@ class TodoFormState extends State<TodoForm> {
                 });
               },
               decoration: InputDecoration(
-                hintText: "Input subtitle",
-                contentPadding: const EdgeInsets.all(16.0)
+                  hintText: "Input subtitle",
+                  contentPadding: const EdgeInsets.all(16.0)
               ),
             ),
             RaisedButton(
               onPressed: () {
-                Navigator.pop(context);
+                if(_formKey.currentState.validate()){
+                  _formKey.currentState.save();
+                  _buildTask();
+                  Navigator.of(context).pop(task);
+                }
               },
               child: Text("Add Task"),
             ),
