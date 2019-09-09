@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 void main() => runApp(MyApp());
 
@@ -27,11 +28,35 @@ class TodoListState extends State<TodoList> {
 
   final _todo = <Task>[];
 
+  void _removeTodoItem(Task task) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return new AlertDialog(
+              title: new Text( task.title + ' is done?'),
+              actions: <Widget>[
+                new FlatButton(
+                    child: new Text('CANCEL'),
+                    onPressed: () => Navigator.of(context).pop()
+                ),
+                new FlatButton(
+                    child: new Text('DONE'),
+                    onPressed: () {
+                      setState(() => _todo.remove(task));
+                      Navigator.of(context).pop();
+                    }
+                )
+              ]
+          );
+        }
+    );
+  }
+
   Widget _buildTodoList() {
     return ListView.builder(
       itemBuilder: (context, i) {
         return _buildTask(_todo[i]);
-      },
+        },
       itemCount: _todo.length,
     );
   }
@@ -42,7 +67,8 @@ class TodoListState extends State<TodoList> {
           title: Text(task.title),
           subtitle: Text(task.subtitle),
           trailing: Icon(Icons.more_vert),
-        )
+          onTap: () => _removeTodoItem(task),
+        ),
     );
   }
 
@@ -54,11 +80,16 @@ class TodoListState extends State<TodoList> {
       ),
       body: _buildTodoList(),
       floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
+        /*ここが重要すぎる！！！*/
+          onPressed: () async {
+            final result = await Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => TodoForm()),
             );
+            if(result != null) {
+              _todo.addAll(<Task>[]..length = 1);
+              _todo[_todo.length - 1] = result;
+            }
           },
           child: new Icon(Icons.add)
       ),
@@ -79,9 +110,6 @@ class Task{
   int get id => _id;
   String get title => _title;
   String get subtitle => _subtitle;
-
-/*セッター*/
-//  set id(int id) => _id = id;
 
 }
 
